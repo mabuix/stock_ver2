@@ -57,3 +57,8 @@ http://127.0.0.1:8000/stock_app/get_daily_data/
 /Users/manatonakane/git/stock_ver2/stock_app/stock_crawl
 % scrapy crawl fundamentals_crawl                                                         [16:34:46]
 ```
+
+- 株価データをgoogle spreadsheetに出力
+```
+http://127.0.0.1:8000/stock_app/create_spreadsheet_data/
+```

@@ -1,11 +1,14 @@
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
 import configparser
 import quandl
 import datetime
 from pprint import pprint
-
 from stock_app.models import DailyData
+from stock_app.models import Fundamentals_Data
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 
 def index(request):
@@ -104,3 +107,72 @@ def get_daily_data_bak(request):
     daily_data.save()
 
     return HttpResponse("metrics get.")
+
+
+def create_spreadsheet_data(request):
+    """
+    google spreadsheetにデータ作成
+
+    スプレッドシート操作用に作成したGoogle APIsプロジェクトのユーザーを、操作したいシートに権限追加して使用する。
+    ユーザー情報は、発行されたService Account Key内の、client_emailに記載。
+    % cat /Users/manatonakane/git/stock_ver2/sandbox-a739dfc2f0da.json
+    """
+
+    scope = ['https://spreadsheets.google.com/feeds']
+
+    # 発行されたService Account Key(jsonファイル)を指定する
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('sandbox-a739dfc2f0da.json', scope)
+
+    gc = gspread.authorize(credentials)
+
+    # ワークブックを開く
+    workbook = gc.open("投資銘柄管理シート for python")
+
+    # シート名を指定して開く
+    try:
+        worksheet = workbook.worksheet("data")
+        # 開けたら、内容リセットするためワークシートを削除
+        workbook.del_worksheet(worksheet)
+    except gspread.exceptions.WorksheetNotFound:
+        pass
+
+    # ワークシートを作成
+    worksheet = workbook.add_worksheet(title="data", rows="100", cols="20")
+
+    # セルのヘッダー更新
+    worksheet.update_acell('A1', 'コード')
+    worksheet.update_acell('B1', '名称')
+    worksheet.update_acell('C1', '日時')
+    worksheet.update_acell('D1', '株価')
+    worksheet.update_acell('E1', '時価総額(百万円)')
+    worksheet.update_acell('F1', '発行済株式数')
+
+    codes = []
+    # 読み込み専用でcode.txtを開く
+    with open('code.txt', 'r') as texts:
+        for text in texts:
+            # 改行を削除
+            codes.append(text.rstrip())
+
+    fundamentals_data_list = Fundamentals_Data.objects.filter(code__in=codes)
+    que_list = []
+    for data in fundamentals_data_list:
+        daily_data = DailyData.objects.filter(code=data.code).order_by('-date').first()
+        que_list.append(data.code)
+        que_list.append(data.name)
+        que_list.append(daily_data.date)
+        que_list.append(daily_data.close)
+        que_list.append(data.market_capitalization)
+        que_list.append(data.outstanding_shares)
+
+    # セルの範囲指定(セルの行数 = ヘッダー一行 + 銘柄数)
+    row_count = fundamentals_data_list.count() + 1
+    cell_list = worksheet.range('A2:F' + str(row_count))
+
+    for cell in cell_list:
+        cell.value = que_list.pop(0)
+
+    # バッチ更新
+    worksheet.update_cells(cell_list)
+
+    return HttpResponse("data created.")

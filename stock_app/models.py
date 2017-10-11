@@ -23,3 +23,12 @@ class DailyData(models.Model):
     volume = models.IntegerField()
 
     objects = DailyDataManager()
+
+
+class Fundamentals_Data(models.Model):
+    code = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=200)
+    market_capitalization = models.IntegerField()
+    outstanding_shares = models.IntegerField()
+
+    objects = models.Manager()

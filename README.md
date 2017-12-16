@@ -62,3 +62,12 @@ http://127.0.0.1:8000/stock_app/get_daily_data/
 ```
 http://127.0.0.1:8000/stock_app/create_spreadsheet_data/
 ```
+
+- チャート描画ツール起動(ローカル)
+```
+% python stock_app/display_chart_for_dash.py                                            [16:49:44]
+ * Running on http://127.0.0.1:8050/ (Press CTRL+C to quit)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 984-699-814
+```

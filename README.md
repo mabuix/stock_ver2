@@ -71,3 +71,5 @@ http://127.0.0.1:8000/stock_app/create_spreadsheet_data/
  * Debugger is active!
  * Debugger PIN: 984-699-814
 ```
+<img width="1426" alt="2017-12-16 16 53 15" src="https://user-images.githubusercontent.com/4246165/34068617-b581f2d8-e281-11e7-86e0-388601b2a150.png">
+

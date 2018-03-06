@@ -67,13 +67,15 @@ dashを使ってチャートをブラウザ表示
 colorscale = cl.scales['9']['qual']['Paired']  # https://plot.ly/ipython-notebooks/color-scales/
 # チャートの開始日
 start_date = '2017-01-01'
+# todo code.txtの読み込み
+codes = [6094, 3550]
 app = dash.Dash()
 app.layout = html.Div([
     html.Div([
         html.H2('監視銘柄チャート'),
     ]),
 
-    dcc.Input(id='my-id', value='initial value', type="hidden"),
+    dcc.Input(id='my-id', value=codes, type="hidden"),
     html.Div(id='graphs')
 ])
 
@@ -84,8 +86,7 @@ app.layout = html.Div([
 )
 def graphs(input_value):
     graphs = []
-    # todo code.txtの読み込み
-    codes = [6094, 3550]
+    codes = input_value
     query = session.query(Fundamental).filter(Fundamental.code.in_(codes))
     for fundamental in query.all():
         code = fundamental.code

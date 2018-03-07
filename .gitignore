@@ -1,4 +1,7 @@
 config.ini
 code.txt
 .idea/
+.vscode
 sandbox-a739dfc2f0da.json
+__pycache__
+__init__.py
